@@ -1,0 +1,32 @@
+% !TeX root = thesis.tex
+\abstract{%
+Suppose two parties, traditionally called Alice and Bob, are
+given respectively the inputs $x\in\mathcal{X}$ and
+$y\in\mathcal{Y}$ to a function
+$f\colon\mathcal{X}\times\mathcal{Y}\to\mathcal{Z}$ and are
+required to compute $f(x,y)$.
+Since each party only has one part of the input, they can
+compute $f(x,y)$ only if some communication takes place between
+them. The communication complexity of a given function is the
+minimum amount of communication (in bits) needed to evaluate it
+on any input with high probability.
+
+We study the communication complexity of two related problems,
+the $k$-Hamming distance and $k$-disjointness and give tight
+bounds to both of these problems: The $r$-round communication
+complexity of the $k$-disjointness problem is
+$\Theta(k\log^{(r)}k)$, whereas a tight $\Omega(k\log k)$ bound
+holds for the $k$-Hamming distance problem for any number of
+rounds.
+
+The lower bound direction of our first result is obtained by
+proving a {\em super-sum} result on computing the OR of $n$
+equality problems, which is the first of its kind.
+Using our second bound, we settle the complexity of various
+property testing problems such as $k$-linearity, which was open
+since 2002 or earlier. Our lower bounds are obtained via
+information theoretic arguments and along the way we resolve a
+question conjectured by Erdős and Simonovits in 1982, which
+incidentally was studied even earlier by Blakley and Dixon in
+1966.
+}

@@ -1,0 +1,146 @@
+% !TeX root = thesis.tex
+\chapter{Introduction}
+\label{sec:introduction}
+
+Communication complexity is a versatile abstraction of communication requirements of computational tasks, leaving aside the compute power required and focusing on bandwidth, latency and everything else communication related.
+
+
+What is communication complexity
+
+Who introduced it
+
+Why is it useful
+
+Useful on its own; an interactive generalization of Shannon's theory of communication.
+
+
+
+In a two player communication problem the players, 
+named Alice and Bob, receive separate inputs, 
+respectively $x\in \mathcal{X}$ and $y\in \mathcal{Y}$, 
+and they communicate in order to compute the value 
+$f(x,y)$ of a function
+$f\colon \mathcal{X}\times \mathcal{Y}\to\binary$ 
+(known to both players). 
+In an $r$-round protocol, the players can take at most 
+$r$ turns alternately sending each other a message 
+(that is, a bit string) and the last player to receive 
+a message declares the output of the protocol.
+A protocol can be {\em deterministic} or {\em randomized}; 
+in the latter case the players can base their actions on 
+a common random source and we measure the 
+{\em error probability}: the maximum over inputs 
+$(x,y)\in \mathcal{X}\times\mathcal{Y}$, of the probability 
+that the output of the protocol differs from $f(x,y)$. 
+The {\em communication cost} of a protocol is the maximum, 
+over the inputs and the random string, of the total number 
+of bits sent between the players.
+For a function 
+$f\colon \mathcal{X}\times\mathcal{Y}\to\binary$, 
+an integer $r$ and $\delta\in[0,1]$, we denote by 
+$R^r_{\delta}(f)$ the minimum over all protocols
+for $f$ having $r$-rounds and error probability at most 
+$\delta$, of the communication cost incurred. We define 
+$R_{\delta}(f)$ similarly, but we take the maximum over 
+$\delta$-error protocols with no restriction on the number 
+of rounds it uses.
+
+In the $k$-Hamming distance problem, denoted $\Ham^n_k$,
+the players receive length-$n$ bit strings, respectively 
+$x,y\in\cube$, and are required determine if 
+$\lone{x-y}< k$ or not.
+There is a well known one-round communication protocol
+which accomplishes this with error probability $\delta$ 
+by communicating $O(k\log\nparen{k/\delta})$ bits.
+
+\begin{theorem}
+[e.g., Huang, Shi, Zhang and Zhu \cite{HuangSZZ2006}]
+\label{thm:ub}
+It holds that $$R^1_\delta(\Ham^n_k) = 
+O(\min\set{k\log\nparen{k/\delta}, k\log (n/k)}).$$
+\end{theorem}
+
+Highly related to the $\Ham^n_k$ is the $k$-disjointness 
+problem $\Disj^n_k$, wherein the players each receive a 
+$k$-subset of $[n]$ and their goal is to determine if their 
+sets intersect.
+Notice that $\Disj^n_k$ can be seen as a promise version of
+$\Ham^n_{2k-2}$ where each player is guaranteed to have a string
+with Hamming weight $k$: the sets are disjoint if and only if the
+Hamming distance between the characteristic vectors of the sets
+is more than $2k-2$. Therefore any upper bound for the $\Ham^n_k$ 
+carries over to $\Disj^n_k$ and any lower bound for $\Disj^n_k$
+carries over to $\Ham^n_k$.
+Around 1993, 
+Håstad and Wigderson \cite{HastadW2007} showed that
+there is a more efficient protocol for $\Disj^n_k$ than that implied 
+by \autoref{thm:ub}, which communicates only $O(k)$ bits, but over
+$O(\log k)$ rounds.
+
+On the lower bounds side, the result of \cite{KalyanasundaramS1992}
+implies that $\Omega(k)$ bits is needed for these problems even
+if one uses arbitrarily large number of round protocols.
+In \cite{BuhrmanGMW2012} it was shown that
+any 1-round protocol for $\Disj^n_k$ needs to communicate
+at least $\Omega(k \log k)$ bits when $k^2<n$
+(this result was proven later in \cite{DasguptaKS12} also).
+In Theorem~3.2 of \cite{Saglam2011}, an $\Omega(k\log(1/\delta))$
+bound for $1$-round complexity of $\Disj^n_k$ was shown even 
+when Bob receives just one element (i.e., the indexing problem) 
+for $k<\delta n$ and a 
+slightly more general result was shown in \cite{JayramW2011}.
+Finally Sağlam and Tardos in \cite{SaglamT2013}, 
+which we review in sections \ref{sec:disj-upperbound} and 
+\ref{sec:disj-lowerbound} of this document, the communication complexity
+of $\Disj^n_k$ was settled:
+\begin{align*}
+R^r_{1/3}(\Disj^n_k)=\Theta(k\log^{(r)}k)
+\end{align*}
+for $1\le r \le \log^*k$ and $k^2<n$.
+Our upper bound solves the disjointness problem with 
+error probability at most $1/\exp k + 1/\exp^{(r)}(c\log^{(r)}k)$ 
+for any $c>1$ by communicating
+$O(k \log^{(r)} k)$ bits over $r$ rounds. In fact bulk of the bits
+is sent in the first round and the rest of the rounds
+amount to an $O(k)$ bits of communication. Taking $r=\log^* k$,
+this leads to an $O(k)$ bits protocol with error probability 
+that is exponentially small in $k$.
+Their lower bound shows that at least one
+message of size 
+$\Omega(k\log^{(r)} k)$ bits needs to be sent by any 
+$r$-round protocol, even if it has error probability $1/3$.
+Prior to this work, this lower bound provided the strongest lower
+bound for $\Ham^n_k$ also, along with the incomparable bound of 
+$\Omega(k\log (1/\delta))$ due to \cite{BlaisBG2014}
+which holds for any number of rounds, which we discuss shortly.
+
+\input{hamvsdisj}
+
+To summarize the above results, the 1-round communication 
+complexity of both $\Disj^n_k$ and $\Ham^n_k$ is 
+$\Theta(k\log(k/\delta))$ by 
+\cite{BuhrmanGMW2012, Saglam2011, JayramW2011} and 
+\cite{HuangSZZ2006}. We know that $\Disj^n_k$ can be solved 
+much more efficiently if one is allowed multiple rounds:
+firstly the $\log k$ factor can be removed \cite{HastadW2007} 
+and secondly the error probability can be brought down to 
+$\exp(-k)$, by using no more than $\log^* k$ rounds 
+\cite{SaglamT2013}. It is an interesting question whether 
+similar efficiency improvements can be obtained for $\Ham^n_k$ 
+also, by using multiple rounds.
+The first separation of $\Disj^n_k$ and $\Ham^n_k$ was proven
+in \cite{BlaisBG2014}, which shows that $\Omega(k\log(1/\delta))$
+lower bound holds for any protocol solving $\Ham^n_k$. 
+Therefore in $\Ham^n_k$, we get no improvements in error probability
+by interactive communication. It remained an open 
+question whether {\em any} improvement can be made 
+at all to the 1-round protocol by communicating interactively.
+In \autoref{sec:ham-lowerbound} we answer this question negatively: 
+\begin{theorem}
+\label{thm:klogk}
+Any two party $\delta$-error randomized protocol
+solving the $k$-Hamming distance problem 
+over length-$n$ strings communicates 
+at least $\Omega(k\log (k/\delta))$ 
+bits for $k^2\le \delta n$.
+\end{theorem}

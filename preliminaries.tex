@@ -1,0 +1,417 @@
+% !TeX root = thesis.tex
+\chapter{Preliminaries}
+\label{sec:prelim}
+
+In this chapter we list the notation we use, conventions we adopt
+and formally and define formally and in more detail 
+the computational models that we work with in this thesis. 
+
+\section{Notation}
+\label{sec:prelim:notation}
+
+We denote by $[n]$ the set $\set{1,2,\ldots,n}$. 
+Throughout this thesis, we
+take $\exp$ and $\log$ functions to the base 2.
+For exponentials and logarithms in other bases
+such as $b$, we write $\exp_b$ and $\log_b$. 
+We adopt the convention $\ln \defeq \log_e$ where $e=2.718\ldots$
+is the limiting value of $(1+1/n)^n$ as $n\to \infty$.
+We will also use
+the iterated versions of these functions:
+\begin{align*}
+  \log^{(0)}x&\defeq x, 
+             & 
+  \exp^{(0)}x&\defeq x,\\
+  \log^{(r)}x&\defeq \log\nparen{\log^{(r-1)}x}, 
+             & 
+  \exp^{(r)}x&\defeq \exp\nparen{\exp^{(r-1)}x}
+  \quad\text{for $r\geq 1$}.
+\end{align*}
+Moreover we define the $\log^* x$ to be the smallest integer $r$ 
+for which $\log^{(r)} x<2$. For instance, we have $\log^* 16 = 3$ and
+$\log^* 2^{16} = 4$.
+The function $\log^*$ is conventionally called the 
+{\em iterated logarithm}, which we adopt. 
+To differentiate, we call the function $\log^{(r)}$ the 
+{\em $r$-iterated logarithm}.
+
+\section{Random variables and distributions}
+\label{sec:prelim:rand}
+Let $\Omega$ be a countable set. 
+For a function $\mu\colon\Omega\to\realspos$ and a set 
+$\Psi\subseteq\Omega$, we use the shorthand
+\begin{align*}
+\mu(\Psi) \defeq \sum_{x\in\Psi}\mu(x).
+\end{align*}
+A function $\mu\colon\Omega\to\realspos$
+is said to be a distribution on $\Omega$ if
+$\mu(\Omega) = 1$ and a subdistribution
+if $\mu(\Omega) \le 1$. For a function
+$\mu$ on $\Omega$, we define
+\begin{align*}
+\supp(\mu)\defeq \setbuilder{x\in \Omega}{\mu(x)>0}.
+\end{align*}
+For two distributions $\mu\colon\Omega_1\to\realspos$
+and $\nu\colon\Omega_2\to\realspos$, let us denote by
+$\mu\nu$ the distribution on $\Omega_1\times\Omega_2$
+given by $(\mu\nu)(x_1,x_2) = \mu(x_1)\nu(x_2)$.
+
+For a discrete random variable $X$, we denote by
+$\dist(X)$ the distribution function of $X$ and
+we define $\supp(X)\defeq\supp(\dist(X))$. 
+If $X$ is so that $\dist(X)\colon\Omega\to\realspos$,
+then we say that $X$ has sample space $\Omega$.
+Two 
+random variables $X$ and $Y$ are said to be 
+independent if $\dist(XY) =\dist(X)\dist(Y)$.
+
+\begin{lemma}[Jensen \cite{Jensen1906}, Formula (5)]
+\label{lem:jensen}
+Let $X$ be a real-valued random variable and
+$f$ be a convex function. We have
+$\E\sparen{f(X)} \ge f(\E[X])$. When
+$f$ is strictly convex, the inequality holds
+with equality if and only if $X$ is constant
+with probability 1.
+\end{lemma}
+
+\section{Facts from information theory}
+\label{sec:prelim:info}
+In this section we review the definitions and 
+facts we use from information theory.
+Let $\mu$ and $\nu$ be two 
+nonnegative functions on $\Omega$.
+The Kullback-Leibler divergence \cite{Wald1945, KullbackL1951}
+of $\mu$ from $\nu$,
+denoted $\kldiv{\mu}{\nu}$, is defined by
+%
+\begin{align}
+\label{eq:kldiv}
+  \kldiv{\mu}{\nu} \defeq \sum_{x\in \Omega}
+      \mu(x)\log\frac{\mu(x)}{\nu(x)}\,.
+\end{align}
+%
+Here, if $\mu(x)=0$ for some $x$, then its contribution
+to the summation is taken as 0, even when $\nu(x)=0$.
+The divergence is undefined if there is an
+$x\in \Omega$ such that $\mu(x)>0$ and
+$\nu(x)=0$.
+It can be shown that if the related series 
+converges for the right hand side of \autoref{eq:kldiv},
+it converges absolutely, 
+which justifies leaving the summation order unspecified.
+A fundamental property of 
+$\kldiv{\cdot}{\cdot}$ is that
+the divergence of a distribution from a subdistribution 
+is always nonnegative.
+\begin{lemma}[Gibbs \cite{Gibbs1902}, Theorem VIII]
+\label{lem:gibbs}
+Let $\mu,\nu\colon\Omega\to\reals$ be such that $\mu$ is a
+distribution and $\nu$ is a subdistribution.
+We have $\kldiv{\mu}{\nu}\ge 0$ with equality if and
+only if $\mu=\nu$.
+\end{lemma}
+\begin{lemma}[Kullback and Leibler \cite{KullbackL1951},
+Lemma 3.2]
+\label{lem:klcond}
+Let $\mu,\nu\colon\Omega\to\realspos$ be so that
+$\mu$ is a distribution on $\Omega$ and 
+$\supp(\mu) = \Psi\subseteq\Omega$. We have
+\begin{align*}
+\kldiv{\mu}{\nu}\ge -\log \nu(\Psi)
+\end{align*}
+with equality if and only if $\mu(x) = \nu(x)/\nu(\Psi)$ for
+$x\in\Psi$ and $\mu(x) = 0$ for $x\notin\Psi$.
+\end{lemma}
+\begin{proof}
+By \autoref{eq:kldiv} we write
+\begin{align*}
+\kldiv{\mu}{\nu} &= -\sum_{x\in \Psi}
+    \mu(x)\log\frac{\nu(x)}{\mu(x)}
+  \ge -\log\sum_{x\in \Psi}\nu(x) =-\log \nu(\Psi)\,,
+\end{align*}
+where the inequality follows from
+\autoref{lem:jensen} and concavity of
+$z\mapsto\log z$ on $\realspos$. 
+If $\mu(x) = \nu(x)/\nu(\Psi)$ for $x\in\Psi$, we have 
+$\kldiv{\mu}{\nu}=-\log \nu(\Psi)$ by direct computation.
+Otherwise $\kldiv{\mu}{\nu}>-\log\nu(\Psi)$ by strict 
+concavity of $z\mapsto\log z$.
+\end{proof}
+
+We extend the divergence notation
+$\kldiv{\cdot}{\cdot}$ to apply to random
+variables as follows. Let $X,Y$ be discrete random
+variables on the same sample space $\Omega$. Define
+\begin{align}
+\label{eq:klrv}
+\kldiv{X}{Y}\defeq \kldiv{\dist(X)}{\dist(Y)}.
+\end{align}
+%
+With this notation in hand, we are ready to define the 
+conditional divergence. Let $X_1X_2$ and $Y_1Y_2$ be 
+random variables defined on the sample space $\Omega_1\times \Omega_2$.
+The divergence of $X_1\emid X_2$ from $Y_1\emid Y_2$ is
+defined by 
+\begin{align}
+\kldiv{X_1\emid X_2}{Y_1\emid Y_2}
+    \defeq \E_{x_2\sim X_2}
+        \kldiv{X_1\emid X_2=x_2}{Y_1\emid Y_2 = x_2}.
+\end{align}
+Here, for each $x_2\in\supp(X_2)$, 
+$X_1\emid X_2=x_2$ and $Y_1\emid Y_2 = x_2$ 
+are random variables on the sample space
+$\Omega_1$ obtained from, respectively
+$X_1X_2$ and $Y_1Y_2$, by conditioning on the
+second coordinate equaling $x_2$.
+% !TeX root = thesis.tex
+\begin{lemma}[e.g., \cite{CoverT2006}]
+\label{lem:klchain}
+Let $X_1X_2$ and $Y_1Y_2$ be random variables, both on the
+sample space $\Omega_1\times \Omega_2$. We have
+\begin{align*}
+\kldiv{X_1X_2}{Y_1Y_2} = 
+    \kldiv{X_1}{Y_1} + \kldiv{X_2\emid X_1}{Y_2\emid Y_1}.
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+Let $\mu,\nu\colon\Omega_1\times \Omega_2\to \realspos$
+be the distributions of respectively $X_1X_2$ and $Y_1Y_2$.
+Using the shorthands
+$\mu(\Omega_1,x_2)\defeq\sum_{x_1\in\Omega_1}\mu(x_1,x_2)$
+and 
+$\nu(\Omega_1,x_2)\defeq\sum_{x_1\in\Omega_1}\nu(x_1,x_2)$,
+we write
+\begin{align*}
+  \kldiv{X_1\emid X_2}{Y_1\emid Y_2} &=
+     \sum_{x_2\in\Omega_2}\mu(\Omega_1,x_2)
+       \sum_{x_1\in\Omega_1}\frac{\mu(x_1,x_2)}
+           {\mu(\Omega_1,x_2)}
+       \log\frac{\mu(x_1,x_2)\nu(\Omega_1,x_2)}
+                {\nu(x_1,x_2)\mu(\Omega_1,x_2)}\\
+  &= \sum_{x_1,x_2}\mu(x_1,x_2)
+       \log\frac{\mu(x_1,x_2)}{\nu(x_1,x_2)} +
+     \sum_{x_2}
+       \mu(\Omega_1,x_2)\log\frac{\nu(\Omega_1,x_2)}
+           {\mu(\Omega_1,x_2)}
+\end{align*}
+by splitting the terms inside the logarithm. 
+Using \autoref{eq:kldiv} together with \autoref{eq:klrv}
+ we conclude
+\begin{align*}
+\kldiv{X_1\emid X_2}{Y_1\emid Y_2}  &= \kldiv{X_1X_2}{Y_1Y_2} - \kldiv{X_2}{Y_2}.
+\end{align*}
+Rearranging, we obtain the statement of the lemma.
+\end{proof}
+
+The next lemma establishes that the Kullback-Leibler divergence
+is jointly convex in its parameters. This fact is also called 
+the data processing inequality for Kullback-Leibler divergence. 
+\begin{lemma}
+\label{lem:klconvex}
+Let $\mu_1,\mu_2\colon\Omega_1\to\realspos$ be distributions
+supported on $\Omega_1$ and let 
+$\nu_1,\nu_2\colon\Omega_2\to\realspos$ be distributions
+supported on $\Omega_2$. For any $a\in[0,1]$, we have 
+\begin{align*}
+\kldiv{a\mu_1 + (1-a)\mu_2}{a\nu_1 + (1-a)\nu_2}
+  \le a\kldiv{\mu_1}{\nu_1} + (1-a)\kldiv{\mu_2}{\nu_2}
+\end{align*}
+\end{lemma}
+
+Further for two reals $p,q\in[0,1]$, we use the shorthand notation 
+$\kldivb{p}{q}$ to denote the divergence of the random variable $P$
+from $Q$ where $P,Q$ are Bernoulli random variables with expectation
+respectively $p$ and $q$.
+
+
+\subsection{Mutual information and Shannon entropy}
+\label{sec:prelim:muti}
+Let $X$ and $Y$ be jointly distributed random variables.
+The 
+mutual information of $X$ and $Y$, 
+denoted $\muti{X}{Y}$, is defined as
+\begin{align}
+\muti{X}{Y} \defeq \kldiv{\dist(X,Y)}{\dist(X)\dist(Y)}.
+\label{eq:muti-def}
+\end{align}
+The mutual information of a random variable 
+with itself, i.e., the quantity $\muti{X}{X}$ is 
+called the Shannon entropy of $X$ and denoted by $\ent{X}$.
+If $X\in[t]^n$ and $L\subseteq[n]$, then the projection of $X$
+to the coordinates in $L$ is denoted by $X_L$. Namely, $X_L$ is
+obtained from $X=(X_1,\ldots,X_n)$ by keeping only the
+coordinates $X_i$ with $i\in L$. The following lemma of Chung et
+al.~\cite{ChungGFS1986} relates the entropy of a variable to the
+entropy of its projections.
+\begin{lemma}[Chung et al.\ \cite{ChungGFS1986}]
+\label{lem:ent-subset}
+Let $\supp(X)\subseteq[t]^n$. We have
+$\frac{l}{n}\ent{X} \leq \E_L[\ent{X_L}]$, where the expectation is taken for
+a uniform random $l$-subset $L$ of $[n]$.
+\end{lemma}
+
+\section{Concentration bounds}
+Let $X_1,\ldots, X_n$ be random
+variables such that $\E[X_i] = \epsilon$ for 
+some $0\leq \epsilon\leq 1$. Define $X = 
+X_1+\cdots + X_n$. By linearity of 
+expectation we have $\E[X] = \epsilon n$.
+If each $X_i$ is chosen independently,
+due  to the concentration of measure phenomenon,
+it is well understood that $X$ takes values 
+close to its expectation with very high probability.
+The classical results of Chernoff 
+\cite{Chernoff1952} and Hoeffding 
+\cite{Hoeffding1963} give quantitative and 
+intuitive bounds on the deviation probability.
+\begin{theorem}[Chernoff \cite{Chernoff1952}]
+\label{thm:chernoff}
+Let $X=X_1+\cdots+ X_n$, where $X_i$ for 
+$i\in [n]$ are independent binary random 
+variables with expectation $\epsilon$. Then 
+for any $\epsilon\leq\gamma\leq 1$ we have 
+\begin{align*}
+  \Pr\sparen{X\geq\gamma n}
+    \leq \exp\nparen{-n\kldivb{\gamma}{\epsilon}}.
+\end{align*}
+\end{theorem}
+
+\begin{proof}
+Let $E$ be the event that $X\ge \gamma n$. 
+Let $\mu$ be the Bernoulli distribution that 
+equals 1 with probability $\epsilon$. We have
+\begin{align*}
+-\log\Pr[E]
+  &= \kldiv{\dist(X_1\ldots X_n\emid E)}{\mu^n} 
+  & \text{(by \autoref{lem:klcond})}\\
+%
+  &\ge \sum_{i=1}^n \kldiv{\dist(X_i\emid E)}{\mu} 
+  &\text{(by \autoref{lem:klchain})}\\
+%
+  &\geq n \kldivb{\gamma}{\epsilon}
+  &\text{(as $\kldivb{\delta}{\epsilon}
+    \geq\kldivb{\gamma}{\epsilon}$ for $\epsilon\leq \gamma\leq\delta$)}
+\end{align*}
+Hence,
+$\Pr[E]
+  \le \exp\nparen{-n\D_2(\gamma\dmid \epsilon)}$ as required.
+\end{proof}
+
+
+\section{Communication complexity and protocols}
+\label{sec:prelim:comm}
+
+\paragraph{The model.} In the two party communication complexity model we have two
+parties called respectively Alice and Bob who are required to
+evaluate a function
+$f\colon\mathcal{X}\times\mathcal{Y}\to\mathcal{Z}$ (known to
+both of them) on some input $(x,y)$ where $x$ is revealed to
+Alice only and $y$ is revealed to Bob only.
+
+In the randomized variant of this model, which is what we solely
+study in this thesis, the players also have access to a shared
+random source. Without loss of generality, the random source can
+be taken as an infinite read-only string of bits, chosen
+uniformly at random. The players, having received their inputs
+$x$ and $y$ respectively, and with access to the shared random
+source, engage in a dialogue by alternately sending each other
+messages in rounds, in order to compute $f(x,y)$. Here, a
+message is a bit string of arbitrary length.
+
+\paragraph{Protocols.}
+A {\em communication protocol} specifies, for each round, which
+player's turn it is to speak and what message should be sent and
+whether the protocol terminates with some answer. The protocol
+specifies the message to be sent through a function mapping the
+random string, the current players input and all the messages
+the current player received so far to a bit string which is to be
+sent to the other player. This ensures that the message sent by
+the players, say Alice for illustration, 
+can depend on only information known to her at the
+time: her own input, the shared random source and the message
+she received in the previous rounds.
+Some message are marked as answers; instead of being sent to the
+other player, these message are to be announced as the output of
+the protocol, after which the protocol terminates. We say that a
+communication protocol for a function
+$f\colon\mathcal{X}\times\mathcal{Y}\to\mathcal{Z}$ has at most $\delta$-error
+if for any input pair $(x,y)\in\mathcal{X}\times\mathcal{Y}$
+with probability at least $1-\delta$ the output of the protocol
+equals $f(x,y)$, where the probability is over the random
+choices that come from the shared random source.
+
+In an $r$-round protocol there are at most $r$ messages
+(excluding the output message) sent for any input and any
+configuration of the shared random source. 
+To illustrate the way the number of messages is counted, consider 
+the following protocol. Alice sends a single message to Bob and 
+in return Bob replies with another message after which Alice
+announces the answer of the protocol. This protocol has two rounds.
+The complexity of a protocol is defined to be the the maximum, over all input pairs
+$(x,y)\in\mathcal{X}\times\mathcal{Y}$ and all choices of the
+random source, of the total number of bits sent by the two
+parties.
+
+Let $P$ be a protocol for a function 
+$f\colon\mathcal{X}\times\mathcal{Y}$. We denote by $P(x,y,r)$
+the output of the protocol on input $x\in\mathcal{X}$, $y\in\mathcal{Y}$
+and when the shared random string is fixed to $r$. We denote by $P(x,y)$ the random
+variable denoting the output of the protocol on inputs $(x,y)$.
+The transcript of the protocol $P$, denoted $\Pi_P(x,y,r)$, 
+is the concatenation of all the messages sent by the players 
+(excluding the answer of the protocol) on inputs
+$x\in\mathcal{X}$, $y\in\mathcal{Y}$ and when the shared random string is $r$.
+Likewise, $\Pi_P(x,y)$ denotes the random variable entailing the communication
+took place the two players when the random source is not fixed. 
+We denote by $\abs{\Pi_P}$ the length of the transcript, in bits.
+
+\paragraph{Communication complexity}
+The $\delta$-error randomized communication complexity of a
+function $f\colon\mathcal{X}\times\mathcal{Y}\to\mathcal{Z}$,
+denoted $R_\delta(f)$, is the minimum over all $\delta$-error
+protocols for $f$, of the complexity of the protocol. We also
+define the $r$-round $\delta$-error randomized communication
+complexity of a function $f$, denoted $R^r_\delta(f)$, wherein
+the minimization this time is over all $r$-round protocols for
+$f$ with at most $\delta$-error. Let us summarize the 
+two key definitions of this section in notation.
+
+For a function 
+$f\colon\mathcal{X}\times\mathcal{Y}\to\mathcal{Z}$,
+\begin{align}
+R_\delta(f) &\defeq 
+  \min_{P}\max_{x\in\mathcal{X},y\in\mathcal{Y},r} \abs{\Pi_P(x,y,r)}
+  \label{def:randcomm}\\
+%
+R^r_\delta(f) &\defeq
+  \min_{P}\max_{x\in\mathcal{X},y\in\mathcal{Y},r} \abs{\Pi_P(x,y,r)}
+  \label{def:randcommr}
+\end{align}
+where $P$ ranges over all $\delta$-error protocols for $f$ in \autoref{def:randcomm}
+and $P$ ranges over all $\delta$-error $r$-round protocols for $f$ in \autoref{def:randcommr}.
+
+\subsection{The $k$-disjointness problem}
+In the $k$-disjointness problem (also known as the sparse set
+disjointness or small set disjointness), each of the players
+receives a subset of $[n]$ of size at most $k$. Call the set
+Alice receives $S$ and the set Bob receives $T$. The goal of the
+players is to determine whether their sets $S$ and $T$ intersect.
+We denote this problem by $\Disj^n_k$.
+
+One useful way to think about $\Disj^n_k$ problem is to associate 
+the sets players receive with their characteristic vectors. This way,
+Alice and Bob each receive an $n$ bit string with at most $k$ ones
+and their goal is to determine if there is a coordinate in which
+both of their strings is one. Notice that the characteristic vectors
+have a common 1 if and only if their Hamming distance is at most $2k-2$.
+
+\subsection{The $k$-Hamming distance problem}
+In the $k$-Hamming distance problem the players get $n$ bit strings,
+say $x,y\in\cube$, respectively with the promise that $\Ham(x,y)\le k$.
+Their goal is to determine whether $\Ham(x,y)$ under this promise.
+Note that by the previous paragraph, the $k$-disjointness problem
+is a special case of the $2k$-Hamming distance problem, therefore
+up to constant factors, the communication complexity of
+$\Disj^n_k$ is upper bounded by $\Ham^n_k$.

@@ -1,0 +1,13 @@
+*.toc
+*.aux
+*.bbl
+*.bcf
+*.log
+*.out
+*.lot
+*.lof
+*.blg
+*.gz
+*.pdf
+uwthesis/
+
