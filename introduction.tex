@@ -2,145 +2,206 @@
 \chapter{Introduction}
 \label{sec:introduction}
 
-Communication complexity is a versatile abstraction of communication requirements of computational tasks, leaving aside the compute power required and focusing on bandwidth, latency and everything else communication related.
+In communication complexity, one tries to understand the 
+limitations of computation through communication bottlenecks. 
+In computation, communication bottlenecks are everywhere; 
+inside the same core, between the cores, inside the same die, package, 
+between the memory and the processor, between software components and more. 
+These bottlenecks are not specific to the current designs of computers; 
+in fact, any physical computer has to deal with similar communication 
+issues as dictated by laws of nature.
+Communication bottlenecks remain relevant and challenging even higher up in the 
+abstraction hierarchy, including theoretical abstractions such as data structures
+and algorithms.
 
+In 1979 to study such bottlenecks in a generic way, 
+Yao introduced the following abstract model \cite{Yao1979}. 
+Two players, called Alice and Bob, are required to evaluate a known 
+function $f$ on inputs $(x,y)$, where Alice has only $x$ and Bob has only $y$.
+The players communicate by sending messages, that is, bit strings, to each other 
+in turns until one of the players is able to deduce $f(x,y)$. The communication
+complexity of one such function $f$ is taken to be the minimum number of bits
+of communication needed to be able to evaluate it on any input $(x,y)$
+with hight probability. Note here that the inputs $x$ and $y$, for instance, 
+may correspond to data stored in separate parts of a computational device and 
+the communication complexity of the function would then model the data transfer 
+between these parts. 
 
-What is communication complexity
+One problem that proved its significance early on in the history of 
+communication complexity is set disjointness. 
+In the set disjointness problem, the players receive respectively subsets $S, T$ 
+of a ground set, say $\set{1,2,\ldots,n}$, and are required to figure out 
+if their sets $S$ and $T$ intersect.
+The first lower bound for this problem that applies even to randomized protocols
+was given by Babai, Frankl and Simon in \cite{BabaiFS1986}. Their lower bound
+shows that any randomized protocol for the set disjointness problem over 
+the ground set $\set{1,2,\ldots, n}$
+requires at least $\Omega(\sqrt{n})$ bits of communication.
+On the flip side, the best known protocol 
+was the trivial one round protocol wherein one players sends their entire 
+input to the other, thereby communicating
+$n$ bits and solving problem deterministically.
+This gap between the upper bound and the lower bound was closed
+in the landmark paper of Kalyanasundaram and Schnitger from 1987,
+which showed a tight $\Omega(n)$ bits lower bound. This result was later 
+simplified in
+influential papers of Razborov \cite{Razborov1992} and Bar-Yossef, Jayram, Kumar and Sivakumar
+\cite{Bar-YossefJKS2004}, which led to a whole new understanding of 
+communication through the lens of
+information theory.
 
-Who introduced it
+\paragraph{The $k$-disjointness problem.}
+To gather a more refined understanding of the set disjointness problem, 
+in this work we study a variant of this problem where
+ the set sizes are restricted to be at most $k$ for some arbitrary parameter $k\le n$. 
+Needless to say, we can always take $k$ large enough to 
+recover the unrestricted version of the problem.
+This restriction, while may seem dull initially given the earlier remark, 
+ allows us to
+uncover an entirely new and surprising aspects of the set disjointness problem: 
+that the complexity of the problem exhibits a rounds versus communication trade-off,
+that vanishes very quickly with increasing number of rounds.
 
-Why is it useful
+In fact, we are not the first to study this restriction 
+on the size of the sets.
+In 1990s Håstad and Wigderson studied this variant of the problem,
+henceforth called the $k$-disjointness problem,
+and gave a protocol which communicates only $O(k)$ bits over $O(\log k)$ rounds,
+solving the problem with constant probability \cite{HastadW1990, ParnafesIRWA1997, HastadW2007}.
+In the first part of this thesis, we improve this protocol 
+to run in just $\log^*k$ rounds, while we simultaneously reduce the error probability to
+exponentially small in $k$. In fact, for an arbitrary integer $r\le \log^* k$, this protocol 
+can be run in $r$ rounds with communication cost $O(k\log^{(r)}k)$ bits in total,
+ and error probability well below polynomial for $r\ge 2$.
+More importantly, we show that this improvement is final: we prove that any $r$-round 
+set disjointness protocol with even constant error probability requires at least one message of size
+$\Omega(k\log^{(r)}k)$ bits. This proof works even when $r$ is a function of $k$ such as $r=\log^* k$, 
+settling the complexity of the problem entirely.
+ 
+\paragraph{The $k$-Hamming distance problem.} 
+An alternative way of viewing the $k$-disjointness problem is through the characteristic 
+vectors of sets $S, T$ given to the players.
+We may think of each player as having received a $k$-sparse bit vector vector and the goal 
+of the players is to understand whether the Hamming distance of their vectors is less than $2k$.
+Notice that the Hamming distance of these vectors is less than $2k$ if and only if the 
+corresponding set $S$ and $T$ intersect.
+An important generalization of this problem is the {\em $k$-Hamming distance problem} 
+wherein the players are given bit vectors, respectively $x$ and $y$,
+within Hamming distance $k$ and the goal of the players is to compute the Hamming distance 
+between $x$ and $y$ exactly. Notice that compared to the $k$-disjointness problem here 
+we removed the $k$-sparsity promise while keeping the closeness promise intact.
 
-Useful on its own; an interactive generalization of Shannon's theory of communication.
+For the $k$-disjointness and the $k$-Hamming distance problems 
+there is a simple 1-round $O(k \log k)$ bits protocol.  As the work of 
+Håstad and Wigderson and our work uncovered, for the $k$-disjointness problem 
+the complexity goes to $k$ very quickly as we allow more and more rounds.
+Interestingly, no such protocol could be found for the $k$-Hamming distance problem;
+not even a single improvement over the easy 1-round protocol.
+This lack of progress became all the more pressing when in 2011 
+Blais Brody and Matulef \cite{BlaisBM2012} showed a connection between
+the $k$-Hamming distance problem and a host of important property testing problems.
 
+\paragraph{The property testing model.}
+In the {\em property testing model} one is given black-box query access 
+to an otherwise unknown function $g$, with the task of determining
+whether the function is inside a certain class or differs from any function inside 
+the class in at least $\eps$-fraction of the possible outputs.
+A function $f\colon\field_2^n\to\field_2$ is called $k$-linear if $f(x)=\iprod{x}{w}$
+for some $w\in\field_2^n$ with $\lone{w}\le k$. In other words, a $k$-linear function 
+outputs the sum of at most $k$ bits of the input in mod 2. 
+In \cite{Blais2009}, Blais gave a $O(\log k)$ round tester with $O(k\log k)$ 
+queries for $k$-linearity. This result was improved in \cite{BuhrmanGMW2012} by Buhrman, Garcia-Soriano, Matsliah and
+de Wolf, who gave a nonadaptive $O(k\log k)$ bits tester. The progress stuck here however  and the gap between the $O(k\log k)$ query upper bound and the $\Omega(k)$ lower bound remained unresolved for several years.
 
+Multiple attempts have been made to show an $\Omega(k\log k)$ lower bound to the $k$-Hamming distance problem
+to close this gap. In \cite{BuhrmanGMW2012}, \cite{DasguptaKS2012}, and \cite{Patrascu2009} an $\Omega(k\log k)$ lower bound was shown, but only for protocols
+having 1 round. These lower bound do not rule however the possibility that the complexity of the $k$-Hamming distance problem
+decays to, say $O(k)$, with multiple rounds, just like the related $k$-disjointness problem.
+In fact, all 3 of these bounds apply to both $k$-disjointness and $k$-Hamming distance problem alike, 
+therefore are incapable of separating them.
+Even some other attempts have been made to prove an 
+$O(k)$ upper bound to the $k$-Hamming distance problem (certainly the present author).
+One daunting challenge in proving a sharp lower bound the the $k$-Hamming distance problem
+lies in the fact that one of the most powerful proof techniques in communication complexity, the corruption
+bound, is {\em unable} prove any bound beyond $\Omega(k\log 1/\delta)$ where $\delta$ is the error probability of the protocol.
+The corruption bound fails due to the existence of large combinatorial rectangles in the communication matrix of the $k$-Hamming distance
+function.
 
-In a two player communication problem the players, 
-named Alice and Bob, receive separate inputs, 
-respectively $x\in \mathcal{X}$ and $y\in \mathcal{Y}$, 
-and they communicate in order to compute the value 
-$f(x,y)$ of a function
-$f\colon \mathcal{X}\times \mathcal{Y}\to\binary$ 
-(known to both players). 
-In an $r$-round protocol, the players can take at most 
-$r$ turns alternately sending each other a message 
-(that is, a bit string) and the last player to receive 
-a message declares the output of the protocol.
-A protocol can be {\em deterministic} or {\em randomized}; 
-in the latter case the players can base their actions on 
-a common random source and we measure the 
-{\em error probability}: the maximum over inputs 
-$(x,y)\in \mathcal{X}\times\mathcal{Y}$, of the probability 
-that the output of the protocol differs from $f(x,y)$. 
-The {\em communication cost} of a protocol is the maximum, 
-over the inputs and the random string, of the total number 
-of bits sent between the players.
-For a function 
-$f\colon \mathcal{X}\times\mathcal{Y}\to\binary$, 
-an integer $r$ and $\delta\in[0,1]$, we denote by 
-$R^r_{\delta}(f)$ the minimum over all protocols
-for $f$ having $r$-rounds and error probability at most 
-$\delta$, of the communication cost incurred. We define 
-$R_{\delta}(f)$ similarly, but we take the maximum over 
-$\delta$-error protocols with no restriction on the number 
-of rounds it uses.
+In 2014, Blais, Brody and Ghazi \cite{BlaisBG2014} showed an 
+$\Omega(k\log 1/\delta)$ lower bound to the $k$-Hamming distance problem 
+using an information theoretic argument. While this may seem like a 
+small improvement over the $\Omega(k)$ lower bound that follows from the 
+work of \cite{KalyanasundaramS1992} as one usually takes $\delta$ to be a constant, 
+the importance of this result lies in that it is the first formal evidence that 
+$k$-Hamming distance is harder than the $k$-disjointness problem. 
+Recall that our upper bound \cite{SaglamT2013} solves the $k$-disjointness problem 
+with $O(k)$ bits of communication and exponentially small error probability in $k$, 
+so no bound of the form $\Omega(k\log 1/\delta)$ can be true for $k$-disjointness. 
+We remark that the lower bound \cite{BlaisBG2014} does not go further than $\Omega(k\log 1/\delta)$ 
+not only due to the limitation of the corruption method alluded to in the earlier paragraph, 
+but actually the problem they study, the $\mathrm{OR}\circ\mathrm{1vs3}$ problem, to establish their $k$-Hamming distance lower bound
+admits an actual $O(k \log 1/\delta)$ upper bound. Notice this is a much stronger statement than the existence of larger rectangles.
 
-In the $k$-Hamming distance problem, denoted $\Ham^n_k$,
-the players receive length-$n$ bit strings, respectively 
-$x,y\in\cube$, and are required determine if 
-$\lone{x-y}< k$ or not.
-There is a well known one-round communication protocol
-which accomplishes this with error probability $\delta$ 
-by communicating $O(k\log\nparen{k/\delta})$ bits.
+The usual decomposition technique employed in randomized communication complexity of 
+considering a special set of possible inputs which can be interpreted as calculating a 
+composed function, say $f\circ g^k$, with a simple $f$ leads to the $\mathrm{OR}\circ\mathrm{1vs3}$
+function of \cite{BlaisBG2014}. As mentioned earlier, this restriction of the problem admits
+and $O(k\log 1/\delta)$ bits upper bound, so is no help to prove an $\Omega(k\log k)$ lower bound.
+In the same work \cite{BlaisBG2014}, the composed function 
+$\mathrm{MAJ}\circ\mathrm{1vs3}$ was proposed as a candidate to obtain an $\Omega(k\log k)$ lower bound.
+However working with the majority function appears to be difficult and it is unclear if the decomposition
+bought us any comfort in proving the optimal lower bound at all.
 
-\begin{theorem}
-[e.g., Huang, Shi, Zhang and Zhu \cite{HuangSZZ2006}]
-\label{thm:ub}
-It holds that $$R^1_\delta(\Ham^n_k) = 
-O(\min\set{k\log\nparen{k/\delta}, k\log (n/k)}).$$
-\end{theorem}
+If one does not go through the decomposition route, the only standard technique 
+which appears to be able to provide a global analysis to the $k$-Hamming distance problem is the spectral norm bound.
+While it is possible to show an $\Omega(k\log\frac{\log1/\delta}{k} + k)$ lower bound to the log-spectral-norm
+of the corresponding $k$-threshold function via a duality argument,  anything beyond this bound proved difficult.
+Through some experimentation with linear program solvers, we believe this lower bound is tight for the log-spectral-norm of the $k$-threshold function.
+In fact, in an upcoming work with de Wolf and Hoyer, we show there are quantum communication protocols for the $k$-Hamming distance problem
+with just $O(k)$ qubits of communication and exponentially small error probability. This implies that the log-spectral-norm of $k$-threshold function is $O(k)$, even though this upper bound does not match the log-spectral-norm lower bound in the $\delta$ parameter. 
 
-Highly related to the $\Ham^n_k$ is the $k$-disjointness 
-problem $\Disj^n_k$, wherein the players each receive a 
-$k$-subset of $[n]$ and their goal is to determine if their 
-sets intersect.
-Notice that $\Disj^n_k$ can be seen as a promise version of
-$\Ham^n_{2k-2}$ where each player is guaranteed to have a string
-with Hamming weight $k$: the sets are disjoint if and only if the
-Hamming distance between the characteristic vectors of the sets
-is more than $2k-2$. Therefore any upper bound for the $\Ham^n_k$ 
-carries over to $\Disj^n_k$ and any lower bound for $\Disj^n_k$
-carries over to $\Ham^n_k$.
-Around 1993, 
-Håstad and Wigderson \cite{HastadW2007} showed that
-there is a more efficient protocol for $\Disj^n_k$ than that implied 
-by \autoref{thm:ub}, which communicates only $O(k)$ bits, but over
-$O(\log k)$ rounds.
+Given that various powerful lower bound techniques in communication complexity are all stuck at $\Omega(k)$, 
+and all upper bound attempt are stuck at $O(k\log k)$,
+it was far from clear what the correct bound for the communication complexity of the $k$-Hamming distance should be.
+In our recent work \cite{Saglam2018}, we managed to find a connection between the $k$-Hamming distance problem and a 
+very natural statement 
+about how heat behaves in time. It turns out, similar question were considered earlier in the literature.
+In 1966, Blakley and Dixon \cite{BlakleyD1966} studied a special case of  our main inequality, defined and proven in \autoref{sec:heat} of this thesis.
+In 1982, Erdős and Simonovits \cite{ErdosS1982}
+studied a slightly more restrictive case of the inequality of \cite{BlakleyD1966} and posed it as a conjecture. 
+In \autoref{sec:heat} we prove that the inequality of Blakley and Dixon holds true even in a more general form, which in turn affirmatively answers the conjecture of Erdős and Simonovits. Furthermore in the second part of \autoref{sec:heat}, we prove a substantial refinement of this inequality, which in essence argues that the probability mass contained in a certain region of Markov chain must be nearly convex
+as a function of time. In \autoref{sec:ham} we prove that the aforementioned inequality about Markov chains is precisely what is needed
+to prove an $\Omega(k\log k)$ lower bound to the $k$-Hamming distance problem, thereby establishing the complexity of 
+$k$-Hamming distance problem and the tight bounds for the property testing of $k$-linearity.
 
-On the lower bounds side, the result of \cite{KalyanasundaramS1992}
-implies that $\Omega(k)$ bits is needed for these problems even
-if one uses arbitrarily large number of round protocols.
-In \cite{BuhrmanGMW2012} it was shown that
-any 1-round protocol for $\Disj^n_k$ needs to communicate
-at least $\Omega(k \log k)$ bits when $k^2<n$
-(this result was proven later in \cite{DasguptaKS12} also).
-In Theorem~3.2 of \cite{Saglam2011}, an $\Omega(k\log(1/\delta))$
-bound for $1$-round complexity of $\Disj^n_k$ was shown even 
-when Bob receives just one element (i.e., the indexing problem) 
-for $k<\delta n$ and a 
-slightly more general result was shown in \cite{JayramW2011}.
-Finally Sağlam and Tardos in \cite{SaglamT2013}, 
-which we review in sections \ref{sec:disj-upperbound} and 
-\ref{sec:disj-lowerbound} of this document, the communication complexity
-of $\Disj^n_k$ was settled:
-\begin{align*}
-R^r_{1/3}(\Disj^n_k)=\Theta(k\log^{(r)}k)
-\end{align*}
-for $1\le r \le \log^*k$ and $k^2<n$.
-Our upper bound solves the disjointness problem with 
-error probability at most $1/\exp k + 1/\exp^{(r)}(c\log^{(r)}k)$ 
-for any $c>1$ by communicating
-$O(k \log^{(r)} k)$ bits over $r$ rounds. In fact bulk of the bits
-is sent in the first round and the rest of the rounds
-amount to an $O(k)$ bits of communication. Taking $r=\log^* k$,
-this leads to an $O(k)$ bits protocol with error probability 
-that is exponentially small in $k$.
-Their lower bound shows that at least one
-message of size 
-$\Omega(k\log^{(r)} k)$ bits needs to be sent by any 
-$r$-round protocol, even if it has error probability $1/3$.
-Prior to this work, this lower bound provided the strongest lower
-bound for $\Ham^n_k$ also, along with the incomparable bound of 
-$\Omega(k\log (1/\delta))$ due to \cite{BlaisBG2014}
-which holds for any number of rounds, which we discuss shortly.
+\section{Our techniques.}
+\label{sec:intro:tech}
 
-\input{hamvsdisj}
+An important challenge in proving the inequality of Blakley and Dixon \cite{BlakleyD1966} is the following.
+Our generalized version of the inequality states that for vectors $u$, $v$ with nonnegative entries and a symmetric matrix $S$ with nonnegative entries,
+we have $\iprod{v}{S^{k}u}^{1/k}\ge\iprod{v}{S^{t}u}^{1/t}$ for $k>t$ integers of the same parity. We remark the nonnegativity requirement on $u,v$ is crucial
+and the inequality fails for general $u,v$. In fact, one way to deduce this is to take our recent $O(k)$ qubits quantum communication protocol for the $k$-Hamming distance problem and obtain $u,v$ from the log-spectral-norm relaxation of the protocol. 
+The key technical challenge in proving this inequality seems to be devising a proof that is sensitive to $u,v$ being in the the positive orthant.
+In \cite{BlakleyR1965} Blakley and Roy showed that the special case $\iprod{v}{S^{k}u}^{1/k} \ge \iprod{v}{Su}$ is true by taking a geometric view and working with the positive orthant directly. For $t>1$, working with the positive orthant directly appears to be very difficulty. 
+Instead, we break apart from the geometric view and into a probabilistic perspective to make positivity an inherent part of the technique.
+We cast this inequality as a probabilistic statement and analyze it through the lens of information theory by viewing it as a success probability of discrete time stochastic process.
 
-To summarize the above results, the 1-round communication 
-complexity of both $\Disj^n_k$ and $\Ham^n_k$ is 
-$\Theta(k\log(k/\delta))$ by 
-\cite{BuhrmanGMW2012, Saglam2011, JayramW2011} and 
-\cite{HuangSZZ2006}. We know that $\Disj^n_k$ can be solved 
-much more efficiently if one is allowed multiple rounds:
-firstly the $\log k$ factor can be removed \cite{HastadW2007} 
-and secondly the error probability can be brought down to 
-$\exp(-k)$, by using no more than $\log^* k$ rounds 
-\cite{SaglamT2013}. It is an interesting question whether 
-similar efficiency improvements can be obtained for $\Ham^n_k$ 
-also, by using multiple rounds.
-The first separation of $\Disj^n_k$ and $\Ham^n_k$ was proven
-in \cite{BlaisBG2014}, which shows that $\Omega(k\log(1/\delta))$
-lower bound holds for any protocol solving $\Ham^n_k$. 
-Therefore in $\Ham^n_k$, we get no improvements in error probability
-by interactive communication. It remained an open 
-question whether {\em any} improvement can be made 
-at all to the 1-round protocol by communicating interactively.
-In \autoref{sec:ham-lowerbound} we answer this question negatively: 
-\begin{theorem}
-\label{thm:klogk}
-Any two party $\delta$-error randomized protocol
-solving the $k$-Hamming distance problem 
-over length-$n$ strings communicates 
-at least $\Omega(k\log (k/\delta))$ 
-bits for $k^2\le \delta n$.
-\end{theorem}
+\section{Future directions}
+\label{sec:intro:future}
+
+A surprising part of our  $\Omega(k\log k)$ lower bound for the $k$-Hamming distance problem is that the proof does not use at all the tensor structure of the hypercube. The only two properties of the hypercube that we use are 1) that it is an undirected graph
+2) that if we perform the standard discrete time random walk from a vertex $u$, at time $t\ll\sqrt{n}$, we end up with a vertex $v$ satisfying $\Ham(u,v) = t$ with probability, say 0.9. 
+
+We believe a similar proof the Gap Hamming Distance problem may be possible. Current lower bound proofs for the Gap Hamming Distance depend heavily on the product structure of the hypercube through concentration of measure phenomenon. We discuss this possibility in \autoref{conj:continuouslogconv}.
+
+\section{Outline}
+In this thesis we study the communication complexity of the 
+$k$-disjointness and $k$-Hamming distance problems. 
+In \autoref{sec:ham}, we give our $k$-disjointness protocol,
+and show a matching lower bound after we take a brief detour 
+into combinatorics to develop our isoperimetric inequality used in the lower bound proof.
+
+Our lower bound for the $k$-Hamming distance, given in \autoref{sec:ham},
+requires us to understand how heat behaves in discrete time. We develop this
+theory in \autoref{sec:heat}. The notation we use and some formal preliminaries
+are given in \autoref{sec:prelim}.
